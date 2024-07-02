@@ -1,9 +1,0 @@
-wl0 1.55[um] Design wavelength
-w_core 0.2[um] Core width
-w_clad  10*w_core Cladding width
-r0 4*wl0 Radius of curvature
-dx 3.5833*w_core Separation between waveguides
-lda0 wl0 Wavelength
-f0 c_const/lda0 Frequency
-n_core 2.5 Core refractive index
-n_clad 1.5 Cladding refractive index
