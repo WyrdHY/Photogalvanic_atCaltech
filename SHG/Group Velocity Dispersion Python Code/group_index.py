@@ -13,12 +13,13 @@ import webbrowser
 #This is a function specifically designed for reading the dat type exported from Comsol
 #However, depending on the content you select to output in Comsol, the code needs to be adjusted
 
-file_path = r"C:\Users\Eric\Desktop\Caltech\photogalvanic_atCaltech\SHG\Group Velocity Dispersion Python Code\data\4x4.dat"
-outputname = "4x4"
-folder = "4x4um"
+file_path = r"C:\Users\Eric\Desktop\Caltech\photogalvanic_atCaltech\SHG\Group Velocity Dispersion Python Code\data\4x12_FHD.dat"
+outputname = "4x12_FHD"
+folder = "4x12um"
+width = 12
+#I defined this to run it as my wish.
 intersection_enable = 0
-
-gate1 = 1
+gate1 = 0
 
 def load_comsol_data(file_path):
     # Initialize a dictionary to store the data
@@ -80,23 +81,25 @@ fine_wavelength_grid = np.linspace(np.min(wavelength_nm), np.max(wavelength_nm),
 ng_interpolator = interp1d(wavelength_nm, ng, kind='cubic')
 fine_ng = ng_interpolator(fine_wavelength_grid)
 
-y0 = ng_interpolator(500)
+
 def find_intersections(x):
+    y0 = ng_interpolator(500)
     return ng_interpolator(x) - y0
+    print(y0)
+
 initial_guesses = [500, 1000]
 if intersection_enable:
     intersections = fsolve(find_intersections, initial_guesses)
 
 
-print(y0)
 
 # Plot the non-interpolated and interpolated ng vs. wavelength
 plt.figure(dpi=300)
-plt.plot(wavelength_nm, ng, 'o', label='Original ng', markersize=0.8)
-plt.plot(fine_wavelength_grid, fine_ng, '-', label='Interpolated ng',linewidth=0.5)
+plt.plot(wavelength_nm, ng, 'o', markersize=0.8)
+plt.plot(fine_wavelength_grid, fine_ng, '-', label=f'ng_{outputname}',linewidth=0.5)
 if intersection_enable:
     plt.axhline(y=y0, color='r', linestyle='--', label=f'y0 = ng(780 nm) = {y0:.4f}',linewidth=0.5)
-plt.plot(wavelength_nm,neff,'o', label='neff', markersize=0.8)
+plt.plot(wavelength_nm,neff,'o', label=f'neff_{outputname}', markersize=0.8)
 if intersection_enable:
     for x in intersections:
         y = ng_interpolator(x)
@@ -105,7 +108,7 @@ if intersection_enable:
 
 plt.xlabel('Wavelength (nm)')
 plt.ylabel('ng')
-plt.title('Group Index vs. Wavelength')
+plt.title('Top ng and bottom neff vs. Wavelength')
 plt.legend()
 relative_path_png = os.path.join(os.path.dirname(__file__), 'result',f'{folder}' ,f'{outputname}.png')
 plt.savefig(relative_path_png)
@@ -243,9 +246,9 @@ if gate1:
     plt.plot(fine_wavelength_grid, fine_ng, '-', linewidth=0.5,color = 'red')
     plt.plot(wavelength_nm,neff,'o', markersize=0.8,color = 'red')
 
-    plt.plot(wavelengthold, ngold, 'o', label='(4x4)', markersize=0.8,color = 'green')
+    plt.plot(wavelengthold, ngold, 'o', label=f'(4x{width})', markersize=0.8,color = 'green')
     plt.plot(fineold_nm, fineold_ng, '-', linewidth=0.5,color = 'green')
-    plt.plot(wavelengthold,neffold,'o'', markersize=0.8,color = 'green')
+    plt.plot(wavelengthold,neffold,'o', markersize=0.8,color = 'green')
 
 
 
@@ -259,7 +262,7 @@ if gate1:
 
     plt.xlabel('Wavelength (nm)')
     plt.ylabel('ng')
-    plt.title('Group Index vs. Wavelength. Bottom two are neff. Top two are neff')
+    plt.title('Group Index vs. Wavelength. Bottom two are neff. Top two are ng')
     plt.legend()
     relative_path_png = os.path.join(os.path.dirname(__file__), 'result',f'{folder}' ,f'{outputname}_compare.png')
     plt.savefig(relative_path_png)
